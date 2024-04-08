@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { ethers, network } from "hardhat";
 import { EthersAdapter } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import Safe, { SafeFactory } from '@safe-global/protocol-kit'
@@ -6,13 +6,14 @@ import { MetaTransactionData } from '@safe-global/safe-core-sdk-types'
 
 async function main() {
     const safeAddress = "0x5B09dB51814cBfaa5Fe3ecf842559C920BdBBc0e";
-    const rpcUrl = "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID";
-    const privateKey = "YOUR_PRIVATE_KEY"; // Use environment variables or secure ways to handle private keys
     const serviceUrl = "https://safe-transaction.sepolia.gnosis.io";
     const chainId: bigint = 11155111n; // SEPOLIA
+    const rpcUrl: string = "https://eth-sepolia.g.alchemy.com/v2/doDEH2L2UI3MQ4M0LveZj1HwVDMDyWi3";
+    const privateKey: string = "d4249acf332177ddd9c18385b9c821ec1015c27454bfc9a7ecb858fe14918a80";
 
-    const provider = new ethers.JsonRpcProvider(rpcUrl);
-    const safeOwner = ethers.Wallet.createRandom(); // TODO: replace to owner wallet
+    // 初始化 Ethers 和 Safe 服务客户端
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const safeOwner = new ethers.Wallet(privateKey, provider)
     const ethAdapter = new EthersAdapter({
         ethers,
         signerOrProvider: safeOwner
@@ -28,11 +29,10 @@ async function main() {
 
     // Create a Safe transaction
     const destination = ethers.ZeroAddress
-    const amount = ethers.parseUnits('0', 'ether').toString()
     const safeTransactionData: MetaTransactionData = {
         to: destination,
         data: deployTransaction.data!,
-        value: amount
+        value: '0'
     }
     // Create a Safe transaction with the provided parameters
     const safeTransaction = await safeSdk.createTransaction({ transactions: [safeTransactionData] })
